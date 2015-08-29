@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -13,6 +14,6 @@ type Task struct {
 	Section         *Section
 }
 
-func (t *Task) getByCode(id int32) Task {
-
+func (t *Task) getByCode(id int32) {
+	fmt.Println("Tello")
 }

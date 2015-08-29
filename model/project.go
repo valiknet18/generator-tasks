@@ -12,24 +12,42 @@ type Project struct {
 	ProjectDescription string
 }
 
-func (p *Project) getByCode(code int) {
-	stmt, err := db.Prepare("SELECT * FROM projects WHERE project_code = ?")
+func GetProjectByCode(code int, db *sql.DB) *Project {
+	row := db.QueryRow("SELECT * FROM projects WHERE project_code = $1", code)
+
+	project := new(Project)
+
+	err := row.Scan(&project.ProjectCode, &project.ProjectName, &project.ProjectDescription)
+
+	if err == sql.ErrNoRows {
+		fmt.Println("Rows not founds")
+	}
+
+	return project
+}
+
+func GetProjects(db *sql.DB) []*Project {
+	var arrayProjects = make([]*Project, 30)
+
+	rows, err := db.Query("SELECT * FROM projects")
 
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	res, err := db.Exec(code)
+	for rows.Next() {
+		project := new(Project)
 
-	if err != nil {
-		fmt.Println(err)
+		err := rows.Scan(&project.ProjectCode, &project.ProjectName, &project.ProjectDescription)
+
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		fmt.Println(project)
+
+		arrayProjects = append(arrayProjects, project)
 	}
 
-	affect, err := res.RowsAffected()
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	fmt.Println(affect)
+	return arrayProjects
 }
